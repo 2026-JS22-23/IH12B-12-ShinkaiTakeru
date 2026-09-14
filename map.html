@@ -1,0 +1,211 @@
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>名古屋観光名所紹介マップ</title>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- jQuery UI -->
+<link rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<style>
+body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    background-color: #eef7ff;
+}
+h1 {
+    margin: 0;
+    padding: 15px;
+    text-align: center;
+    background-color: #2196F3;
+    color: white;
+}
+#map {
+    width: 100%;
+    height: 650px;
+}
+#infoBox {
+    position: absolute;
+    top: 90px;
+    right: 20px;
+    width: 320px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px gray;
+    z-index: 10;
+}
+#infoBox img {
+    width: 100%;
+    border-radius: 8px;
+}
+.mapButton,
+.siteButton {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+.mapButton {
+    background-color: #2196F3;
+}
+.siteButton {
+    background-color: #4CAF50;
+}
+.mapButton:hover {
+    background-color: #1565C0;
+}
+.siteButton:hover {
+    background-color: #388E3C;
+}
+.infoWindow {
+    width: 250px;
+}
+.infoWindow img {
+    width: 230px;
+    border-radius: 5px;
+}
+</style>
+<script>
+let map;
+function initMap() {
+    /* 名古屋市中心 */
+    const center = {
+        lat: 35.1815,
+        lng: 136.9066
+    };
+    map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom: 13,
+            center: center
+        }
+    );
+    const places = [
+        {
+            name: "名古屋城",
+            position: {
+                lat: 35.1858,
+                lng: 136.8992
+            },
+            image: "images/nagoyajou.jpg",
+            description:
+            "名古屋城は1610年に徳川家康が築いた、日本を代表する近世城郭です。尾張徳川家（御三家筆頭）の居城として栄え、屋根に輝く「金のシャチホコ」や、江戸時代初期の最高傑作とされる「本丸御殿」が有名です。国の特別史跡に指定されています",
+            url: "https://www.nagoyajo.city.nagoya.jp/"
+        },
+        {
+            name: "オアシス21",
+            position: {
+                lat: 35.1696,
+                lng: 136.9087
+            },
+            image: "images/oashis.jpg",
+            description:
+            "オアシス21は、愛知県名古屋市東区の栄にある、公園・バスターミナル・ショップが一体となった立体型の公共・商業複合施設です。2002年10月に開業し、空中に浮かぶガラスの大屋根「水の宇宙船」が街のシンボルとなっています。",
+            url: "https://www.sakaepark.co.jp/"
+        },
+        {
+            name: "熱田神宮",
+            position: {
+                lat: 35.1278,
+                lng: 136.9086
+            },
+            image: "images/atsuta.jpg",
+            description:
+            "愛知県名古屋市にある熱田神宮は、創建から1,900年を超える極めて格式の高い古社です。皇室の「三種の神器」の一つである「草薙神剣（くさなぎのつるぎ）」を御神体として祀っており、伊勢神宮に並ぶ特別な神社として親しまれています。",
+            url: "https://www.atsutajingu.or.jp/"
+        }
+    ];
+    places.forEach(function(place) {
+        const marker = new google.maps.Marker({
+            position: place.position,
+            map: map,
+            title: place.name
+        });
+        const infoWindow = new google.maps.InfoWindow({
+            content:
+            `
+            <div class="infoWindow">
+                <h3>${place.name}</h3>
+                <img src="${place.image}">
+                <p>
+                    ${place.description}
+                </p>
+            </div>
+            `
+        });
+        marker.addListener("click", function() {
+            /* Google Mapsの情報ウィンドウを表示 */
+            infoWindow.open({
+                anchor: marker,
+                map: map
+            });
+            $("#infoBox").html(
+                `
+                <h2>${place.name}</h2>
+                <img src="${place.image}">
+                <p>
+                    ${place.description}
+                </p>
+                <button
+                    class="mapButton"
+                    onclick="
+                        moveMap(
+                            ${place.position.lat},
+                            ${place.position.lng}
+                        )
+                    "
+                >
+                    地図でこの場所へ移動
+                </button>
+                <button
+                    class="siteButton"
+                    onclick="
+                        window.open(
+                            '${place.url}',
+                            '_blank'
+                        )
+                    "
+                >
+                    紹介サイトを見る
+                </button>
+                `
+            );
+        });
+    });
+}
+function moveMap(lat, lng) {
+    map.setCenter({
+        lat: lat,
+        lng: lng
+    });
+    map.setZoom(16);
+}
+</script>
+</head>
+<body>
+<h1>
+    名古屋の観光名所紹介
+</h1>
+<div id="map"></div>
+<div id="infoBox">
+    <h2>
+        名古屋観光
+    </h2>
+    <p>
+        地図上のマーカーをクリックすると、
+        観光名所の詳細情報が表示されます。
+    </p>
+</div>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC941UGrKYVrNGb4VqXBXwBRPLWuaWLY_Q&callback=initMap">
+</script>
+</body>
+</html>
